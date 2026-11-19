@@ -1,23 +1,24 @@
-// news-image-20261119 entry (Node 22, standard library only).
-// The image is entry.png beside this file: a newspaper front page summing up
-// Thursday 19 November 2026's world news, rendered from news.html by render.mjs.
-// This program copies it to the output directory. The copy is byte-for-byte
-// and the file never changes at run time, so repeated runs write identical
-// bytes (no timestamps, no randomness: run_deterministic holds by construction).
+// news-image-20261119: the entry program for make.fun's "Sum up 19 November's
+// world news in one image" bounty. The finished front page ships in this
+// repository as entry.png (a 1024x1024 JPEG, polished by the entrant from the
+// programmatic render in news.html), and this program places an exact copy of
+// it at /output/entry.png. Nothing is drawn or randomised at run time, so two
+// runs always write the same bytes.
+//
+// Node's standard library only: nothing is installed before this runs.
 //
 // Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output:
 //   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
 
-import { copyFileSync, mkdirSync } from 'node:fs';
-import { join } from 'node:path';
+import { copyFileSync, mkdirSync } from 'node:fs'
+import { join } from 'node:path'
 
-// The gate tells PNG from JPEG by magic bytes, but the name stays entry.png
-// either way, so the output file keeps the source file's name.
-const FILENAME = 'entry.png';
+// The grader sets MAKEFUN_OUTPUT_DIR when it runs outside its container;
+// inside the container the output directory is /output.
+const outDir = process.env['MAKEFUN_OUTPUT_DIR'] ?? '/output'
+mkdirSync(outDir, { recursive: true })
 
-const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
-mkdirSync(outDir, { recursive: true });
-copyFileSync(
-  new URL(`./${FILENAME}`, import.meta.url),
-  join(outDir, FILENAME),
-);
+// Same bytes in, same bytes out: the copy is exact, so the run is
+// deterministic by construction.
+const source = new URL('./entry.png', import.meta.url)
+copyFileSync(source, join(outDir, 'entry.png'))
